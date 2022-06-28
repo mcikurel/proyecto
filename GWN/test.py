@@ -25,6 +25,7 @@ parser.add_argument('--dropout',type=float,default=0.3,help='dropout rate')
 parser.add_argument('--weight_decay',type=float,default=0.0001,help='weight decay rate')
 parser.add_argument('--checkpoint',type=str,help='')
 parser.add_argument('--plotheatmap',type=str,default='True',help='')
+parser.add_argument('--desc',type=str,default='',help='')
 
 
 args = parser.parse_args()
@@ -103,18 +104,18 @@ def main():
 #     y3 = realy[:,99,2].cpu().detach().numpy()
 #     yhat3 = scaler.inverse_transform(yhat[:,99,2]).cpu().detach().numpy()
     
-    # Try to get all predictions for every sensor
-    df_dict = {}
-    for i in range(124):
-        y12 = realy[:,i,11].cpu().detach().numpy()
-        yhat12 = scaler.inverse_transform(yhat[:,i,11]).cpu().detach().numpy()
-        df_dict[f'real12_{i}'] = y12
-        df_dict[f'pred12_{i}'] = yhat12
-    
-    
-#     df2 = pd.DataFrame({'real12':y12,'pred12':yhat12, 'real3': y3, 'pred3':yhat3})
-    df2 = pd.DataFrame(df_dict)
-    df2.to_csv('./wave.csv',index=False)
+    # For every prediction horizon
+    for h in range(12):
+        df_dict = {}
+        # For every node
+        for i in range(args.num_nodes):
+            y = realy[:,i,h].cpu().detach().numpy()
+            yhat = scaler.inverse_transform(yhat[:,i,h]).cpu().detach().numpy()
+            df_dict[f'real{h}_{i}'] = y
+            df_dict[f'pred{h}_{i}'] = yhat
+        
+        df2 = pd.DataFrame(df_dict)
+        df2.to_csv(f'./{args.desc}_wave_{h}.csv',index=False)
 
 
 if __name__ == "__main__":
