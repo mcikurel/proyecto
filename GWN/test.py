@@ -115,7 +115,7 @@ def main():
             df_dict[f'pred{h}_{i}'] = yhat
         
         df2 = pd.DataFrame(df_dict)
-        df2.to_csv(f'./{args.desc}_wave_{h}.csv',index=False)
+        df2.to_csv(f'./{args.desc}_real_v_pred_{h}.csv',index=False)
 
 
 if __name__ == "__main__":
