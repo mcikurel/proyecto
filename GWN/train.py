@@ -83,13 +83,18 @@ def main():
             trainx = trainx.transpose(1, 3)
             trainy = torch.Tensor(y).to(device)
             trainy = trainy.transpose(1, 3)
+            
+            # Calculate and append training metrics
             metrics = engine.train(trainx, trainy[:,0,:,:])
             train_loss.append(metrics[0])
             train_mape.append(metrics[1])
             train_rmse.append(metrics[2])
+
+            # Log on console
             if iter % args.print_every == 0 :
                 log = 'Iter: {:03d}, Train Loss: {:.4f}, Train MAPE: {:.4f}, Train RMSE: {:.4f}'
                 print(log.format(iter, train_loss[-1], train_mape[-1], train_rmse[-1]),flush=True)
+
         t2 = time.time()
         train_time.append(t2-t1)
         
@@ -104,15 +109,18 @@ def main():
             testx = testx.transpose(1, 3)
             testy = torch.Tensor(y).to(device)
             testy = testy.transpose(1, 3)
+            
+            # Calculate and append validation metrics
             metrics = engine.eval(testx, testy[:,0,:,:])
             valid_loss.append(metrics[0])
             valid_mape.append(metrics[1])
             valid_rmse.append(metrics[2])
+
         s2 = time.time()
         log = 'Epoch: {:03d}, Inference Time: {:.4f} secs'
         print(log.format(i,(s2-s1)))
         val_time.append(s2-s1)
-
+        
         mtrain_loss = np.mean(train_loss)
         mtrain_mape = np.mean(train_mape)
         mtrain_rmse = np.mean(train_rmse)
@@ -134,10 +142,10 @@ def main():
     print("Average Training Time: {:.4f} secs/epoch".format(np.mean(train_time)))
     print("Average Inference Time: {:.4f} secs".format(np.mean(val_time)))
 
-    # Testing
+    # TESTING
+    # Choose best model based on loss
     bestid = np.argmin(his_loss)
     engine.model.load_state_dict(torch.load(args.save+"_epoch_"+str(bestid+1)+"_"+str(round(his_loss[bestid],2))+".pth"))
-
 
     outputs = []
     realy = torch.Tensor(dataloader['y_test']).to(device)
@@ -153,10 +161,11 @@ def main():
     yhat = torch.cat(outputs,dim=0)
     yhat = yhat[:realy.size(0),...]
 
-
     print("Training finished")
     print("The valid loss on best model is", str(round(his_loss[bestid],4)))
 
+
+    # Evaluate every horizon on the best model
     amae = []
     amape = []
     armse = []
@@ -169,11 +178,15 @@ def main():
         amae.append(metrics[0])
         amape.append(metrics[1])
         armse.append(metrics[2])
+        
+        # Save test metrics to test_metrics.csv
         test_metrics_df.loc[i+1] = [metrics[0], metrics[1], metrics[2]]
         test_metrics_df.round(6).to_csv(args.save + 'gwn_test_metrics.csv')
 
+    # Print average metrics
     log = 'On average over 12 horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
     print(log.format(np.mean(amae),np.mean(amape),np.mean(armse)))
+    
     # Save best model
     torch.save(engine.model.state_dict(), args.save + "gwn_best_model.pth")
 
