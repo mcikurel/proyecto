@@ -26,6 +26,7 @@ parser.add_argument('--weight_decay',type=float,default=0.0001,help='weight deca
 parser.add_argument('--checkpoint',type=str,help='')
 parser.add_argument('--plotheatmap',type=str,default='True',help='')
 parser.add_argument('--desc',type=str,default='',help='')
+parser.add_argument('--output_dir',type=str,default='.',help='')
 
 
 args = parser.parse_args()
@@ -115,7 +116,7 @@ def main():
             df_dict[f'pred{h}_{i}'] = yhat
         
         df2 = pd.DataFrame(df_dict)
-        df2.to_csv(f'./{args.desc}_real_v_pred_{h}.csv',index=False)
+        df2.to_csv(f'{args.output_dir}/{args.desc}_real_v_pred_{h}.csv',index=False)
 
 
 if __name__ == "__main__":
