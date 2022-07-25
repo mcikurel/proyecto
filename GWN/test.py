@@ -111,9 +111,9 @@ def main():
         # For every node
         for i in range(args.num_nodes):
             y = realy[:,i,h].cpu().detach().numpy()
-            yhat = scaler.inverse_transform(yhat[:,i,h]).cpu().detach().numpy()
+            ypred = scaler.inverse_transform(yhat[:,i,h]).cpu().detach().numpy()
             df_dict[f'real{h}_{i}'] = y
-            df_dict[f'pred{h}_{i}'] = yhat
+            df_dict[f'pred{h}_{i}'] = ypred
         
         df2 = pd.DataFrame(df_dict)
         df2.to_csv(f'{args.output_dir}/{args.desc}_real_v_pred_{h}.csv',index=False)
