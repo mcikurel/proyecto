@@ -88,7 +88,7 @@ def main():
         
         # Save metrics to csv file
         test_metrics_df.loc[i+1] = [metrics[0], metrics[1], metrics[2]]
-        test_metrics_df.round(6).to_csv('gwn_eval_test_metrics.csv')
+        test_metrics_df.round(6).to_csv(f'{args.output_dir}/{args.desc}_gwn_eval_test_metrics.csv')
 
     log = 'On average over 12 horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
     print(log.format(np.mean(amae),np.mean(amape),np.mean(armse)))
@@ -102,7 +102,7 @@ def main():
         adp = adp*(1/np.max(adp))
         df = pd.DataFrame(adp)
         sns.heatmap(df, cmap="RdYlBu")
-        plt.savefig("./emb"+ '.pdf')
+        plt.savefig(f'{args.output_dir}/emb'+ '.pdf')
 
 #     y12 = realy[:,99,11].cpu().detach().numpy()
 #     yhat12 = scaler.inverse_transform(yhat[:,99,11]).cpu().detach().numpy()
