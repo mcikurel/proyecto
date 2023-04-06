@@ -71,7 +71,8 @@ def main():
     yhat = torch.cat(outputs,dim=0)
     yhat = yhat[:realy.size(0),...]
 
-
+    test_metrics_df = pd.DataFrame(columns=['test_mae', 'test_mape', 'test_rmse'])
+    
     amae = []
     amape = []
     armse = []
@@ -84,6 +85,10 @@ def main():
         amae.append(metrics[0])
         amape.append(metrics[1])
         armse.append(metrics[2])
+        
+        # Save metrics to csv file
+        test_metrics_df.loc[i+1] = [metrics[0], metrics[1], metrics[2]]
+        test_metrics_df.round(6).to_csv(args.save + 'gwn_eval_test_metrics.csv')
 
     log = 'On average over 12 horizons, Test MAE: {:.4f}, Test MAPE: {:.4f}, Test RMSE: {:.4f}'
     print(log.format(np.mean(amae),np.mean(amape),np.mean(armse)))
