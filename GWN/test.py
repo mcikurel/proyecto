@@ -27,6 +27,7 @@ parser.add_argument('--checkpoint',type=str,help='')
 parser.add_argument('--plotheatmap',type=str,default='True',help='')
 parser.add_argument('--desc',type=str,default='',help='')
 parser.add_argument('--output_dir',type=str,default='.',help='')
+parser.add_argument('--pred_out',type=int,default=12,help='prediction outputs')
 
 
 args = parser.parse_args()
@@ -111,7 +112,7 @@ def main():
 #     yhat3 = scaler.inverse_transform(yhat[:,99,2]).cpu().detach().numpy()
     
     # For every prediction horizon
-    for h in range(12):
+    for h in range(args.pred_out):
         df_dict = {}
         # For every node
         for i in range(args.num_nodes):
